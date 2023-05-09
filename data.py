@@ -110,7 +110,7 @@ def test():
 
 
 # get_edge_cov(r'C:\Users\59489\Desktop\研究生\科研\代码\模型\libxml\edge_info.txt')
-get_byte(r'./in/')
+# get_byte(r'./in/')
 # get_bits(path=r'C:\Users\59489\Desktop\研究生\科研\代码\neuzz-old\seeds\id^%000003,src^%000000,op^%flip1,pos^%2')
 
 

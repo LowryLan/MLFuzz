@@ -85,7 +85,7 @@ def test(path=None):
     :parameter path: seed path
     :return: weight list of byte sequence
     """
-    path = './in/'
+    # path = './programs/libxml/in/'
     multihead_attn = MultiHeadAttention(d_model=10000, n_heads=8)
     x_arr = data.get_byte(path)
     x_arr = np.array([x_arr])
@@ -95,3 +95,6 @@ def test(path=None):
     output = output[0].detach().numpy()
     print(output)
     return output
+
+
+test('./programs/libxml/in/')
