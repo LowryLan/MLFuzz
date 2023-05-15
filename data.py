@@ -49,10 +49,12 @@ def get_bits(max_feature_length=10000, path=None):
     """
     x_data = []
     longest_testcase_length = 0
+    ll = 0
     with open(path, "r", encoding='iso-8859-1') as f:
         t = f.read()
         byarray = bytearray(t, encoding='iso-8859-1')
         # print(x)
+        ll = ll + len(byarray)
         if len(byarray) > longest_testcase_length:
             longest_testcase_length = len(byarray)
         if len(byarray) > max_feature_length:
@@ -68,7 +70,7 @@ def get_bits(max_feature_length=10000, path=None):
         # print(b10_list)
         x_data.append(b10_list)
     # print(x_data[0])
-    return x_data[0]
+    return x_data[0], ll
 
 
 def get_byte(dir_path=None):
@@ -77,7 +79,8 @@ def get_byte(dir_path=None):
     :param dir_path: 种子目录路径
     """
     X = []  # 用于存储特征值
-    X_file_name = []  # 用于存储被选出的种子文件名
+    X_file_name = []    # 用于存储被选出的种子文件名
+    file_len = []       # 用于存储种子字节的长度
     files = os.listdir(dir_path)
     for file in files:  # 遍历文件夹
         if file == '.state':
@@ -85,12 +88,13 @@ def get_byte(dir_path=None):
             continue
         X_file_name.append(file)  # 存储所有种子文件名
         file = dir_path + '' + file
-        x_data = get_bits(path=file)
+        x_data, x_len = get_bits(path=file)
         X.append(x_data)
+        file_len.append(x_len)
     X = np.array(X)
     # print(len(X))
     # print(X)
-    return X
+    return X, X_file_name, file_len
 
 
 def test():

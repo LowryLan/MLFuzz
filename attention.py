@@ -78,23 +78,55 @@ class MultiHeadAttention(nn.Module):
         return attn_output
 
 
-def test(path=None):
+def generate_weight(path=None):
     """
-    Get weight sequence of byte sequence
+    Get weight metric of byte metric
 
     :parameter path: seed path
     :return: weight list of byte sequence
     """
     # path = './programs/libxml/in/'
+    if path is None:
+        return 0
+
     multihead_attn = MultiHeadAttention(d_model=10000, n_heads=8)
-    x_arr = data.get_byte(path)
-    x_arr = np.array([x_arr])
-    x_arr = x_arr.astype(np.float32)
-    x_ten = torch.tensor(x_arr)
-    output = multihead_attn(x_ten)
+
+    byte_arr, file_list, file_len = data.get_byte(path)
+    byte_arr = np.array([byte_arr])
+    byte_arr = byte_arr.astype(np.float32)
+    byte_ten = torch.tensor(byte_arr)
+
+    output = multihead_attn(byte_ten)
     output = output[0].detach().numpy()
-    print(output)
-    return output
+
+    if write_to_file(output, file_list, file_len):
+        return 1
+    else:
+        return -1
 
 
-test('./programs/libxml/in/')
+def write_to_file(w_matrix=None, file_list=None, file_len=None):
+    """
+    Write weight metric info to file
+
+    :param file_len: length of byte sequence in one seed
+    :param file_list: file name list
+    :parameter w_matrix: [np.array] weight matrix of seed byte
+    :return: 1 or -1
+    """
+
+    if w_matrix is None or file_list is None:
+        return -1
+
+    with open('weight_info', 'w') as f:
+        for i in range(len(file_list)):
+            # print(file_list[i] + ": " + str(w_matrix[i][0]))
+            j = file_len[i]
+            weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+            f.write(','.join(weight_info) + '|' + file_list[i] + '\n')
+    # print(a)
+    # print(b)
+    return 1
+
+
+# print(generate_weight('./programs/libxml/in/'))
