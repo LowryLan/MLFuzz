@@ -26,7 +26,7 @@ def main():
             break
         else:
             print('connected')
-            attention.generate_weight('./programs/libxml/in2/')
+            attention.generate_weight('./programs/libxml/in/')
             print('generate complete')
             conn.sendall(b"yesss")
     conn.close()

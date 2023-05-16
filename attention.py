@@ -99,7 +99,20 @@ def generate_weight(path=None):
     output = multihead_attn(byte_ten)
     output = output[0].detach().numpy()
 
-    if write_to_file(output, file_list, file_len):
+    # 按照文件id重新排序
+    index_list = []
+    file_len_new = []
+    file_list_new = []
+    output_new = []
+    for i in range(len(file_list)):
+        index = int(file_list[i].split(',')[0].split(':')[1])
+        index_list.append(index)
+    for i in range(len(file_list)):
+        file_list_new.append(file_list[index_list.index(i)])
+        file_len_new.append(file_len[index_list.index(i)])
+        output_new.append(output[index_list.index(i)])
+
+    if write_to_file(output_new, file_list_new, file_len_new):
         return 1
     else:
         return -1
@@ -124,6 +137,7 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None):
             j = file_len[i]
             weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
             f.write(','.join(weight_info) + '|' + file_list[i] + '\n')
+            # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     # print(a)
     # print(b)
     return 1
