@@ -131,12 +131,12 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None):
     if w_matrix is None or file_list is None:
         return -1
 
-    with open('weight_info', 'w') as f:
+    with open('/home/lowry/Documents/myFuzz/MLFuzz/programs/readelf/weight_info', 'w') as f:
         for i in range(len(file_list)):
             # print(file_list[i] + ": " + str(w_matrix[i][0]))
             j = file_len[i]
             weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
-            f.write(','.join(weight_info) + '|' + file_list[i] + '\n')
+            f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/readelf/out/queue/' + file_list[i] + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     # print(a)
     # print(b)

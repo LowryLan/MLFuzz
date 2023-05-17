@@ -1,4 +1,5 @@
-export AFL=/home/lowry/Documents/myFuzz/MLFuzz/afl-lowry
-
 rm -rf out
-$AFL/afl-fuzz -i in2 -o out ./xmllint @@
+rm -rf weight_info
+rm -rf weight_info_r
+
+./afl-fuzz -i in -o out ./xmllint @@

@@ -19,14 +19,16 @@ def main():
     sock.listen(1)
     conn, addr = sock.accept()
     print('connected by neuzz execution moduel ' + str(addr))
+    attention.generate_weight('./programs/readelf/out/queue/')
     conn.sendall(b"start")
+    print("send success")
     while True:
         data = conn.recv(1024)
         if not data:
             break
         else:
             print('connected')
-            attention.generate_weight('./programs/libxml/in/')
+            attention.generate_weight('./programs/readelf/out/queue/')
             print('generate complete')
             conn.sendall(b"yesss")
     conn.close()
