@@ -18,8 +18,9 @@ def main():
     sock.bind((HOST, PORT))
     sock.listen(1)
     conn, addr = sock.accept()
+    path = './programs/zlib/out/queue/'
     print('connected by neuzz execution moduel ' + str(addr))
-    attention.generate_weight('./programs/readelf/out/queue/')
+    attention.generate_weight(path)
     conn.sendall(b"start")
     print("send success")
     while True:
@@ -28,7 +29,7 @@ def main():
             break
         else:
             print('connected')
-            attention.generate_weight('./programs/readelf/out/queue/')
+            attention.generate_weight(path)
             print('generate complete')
             conn.sendall(b"yesss")
     conn.close()
