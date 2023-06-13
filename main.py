@@ -26,15 +26,15 @@ def get_args():
 
 def main():
     print('begin py mode')
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((HOST, PORT))
-    sock.listen(1)
-    conn, addr = sock.accept()
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # sock.bind((HOST, PORT))
+    # sock.listen(1)
+    # conn, addr = sock.accept()
     project, PUT = get_args()
     path = './programs/' + project + '/out/queue/'
-    print('connected by neuzz execution moduel ' + str(addr))
+    # print('connected by neuzz execution moduel ' + str(addr))
     attention.generate_weight(path, project)
-    conn.sendall(b"start")
+    # conn.sendall(b"start")
     print("send success")
     while True:
         data = conn.recv(1024)

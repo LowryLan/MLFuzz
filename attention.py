@@ -90,12 +90,16 @@ def generate_weight(path=None, project=None):
     if path is None or project is None:
         return 0
 
-    multihead_attn = MultiHeadAttention(d_model=10000, n_heads=8)
-
+    d_model = 10000
+    """ TODO: set a value to make program running if byte length more than 10000 """
+    if project == 'zlib':
+        d_model = 10000
     byte_arr, file_list, file_len = data.get_byte(path)
     byte_arr = np.array([byte_arr])
     byte_arr = byte_arr.astype(np.float32)
     byte_ten = torch.tensor(byte_arr)
+
+    multihead_attn = MultiHeadAttention(d_model=d_model, n_heads=8)
 
     output = multihead_attn(byte_ten)
     output = output[0].detach().numpy()

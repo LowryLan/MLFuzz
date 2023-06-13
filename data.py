@@ -54,6 +54,7 @@ def get_bits(max_feature_length=10000, path=None):
         byarray = bytearray(t, encoding='iso-8859-1')
         # print(x)
         ll = ll + len(byarray)
+        longest_testcase_length = 0
         if len(byarray) > longest_testcase_length:
             longest_testcase_length = len(byarray)
         if len(byarray) > max_feature_length:
