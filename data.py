@@ -48,7 +48,6 @@ def get_bits(max_feature_length=10000, path=None):
     :return: 二进制数据
     """
     x_data = []
-    longest_testcase_length = 0
     ll = 0
     with open(path, "r", encoding='iso-8859-1') as f:
         t = f.read()
@@ -111,10 +110,3 @@ def test():
         # print(b10)
         b10_list.append(b10)
     print(b10_list)
-
-
-# get_edge_cov(r'C:\Users\59489\Desktop\研究生\科研\代码\模型\libxml\edge_info.txt')
-# get_byte(r'./in/')
-# get_bits(path=r'C:\Users\59489\Desktop\研究生\科研\代码\neuzz-old\seeds\id^%000003,src^%000000,op^%flip1,pos^%2')
-
-

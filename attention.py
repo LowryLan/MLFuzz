@@ -78,15 +78,16 @@ class MultiHeadAttention(nn.Module):
         return attn_output
 
 
-def generate_weight(path=None):
+def generate_weight(path=None, project=None):
     """
     Get weight metric of byte metric
 
+    :param project: project directory name
     :parameter path: seed path
     :return: weight list of byte sequence
     """
     # path = './programs/libxml/in/'
-    if path is None:
+    if path is None or project is None:
         return 0
 
     multihead_attn = MultiHeadAttention(d_model=10000, n_heads=8)
@@ -112,16 +113,17 @@ def generate_weight(path=None):
         file_len_new.append(file_len[index_list.index(i)])
         output_new.append(output[index_list.index(i)])
 
-    if write_to_file(output_new, file_list_new, file_len_new):
+    if write_to_file(output_new, file_list_new, file_len_new, project):
         return 1
     else:
         return -1
 
 
-def write_to_file(w_matrix=None, file_list=None, file_len=None):
+def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None):
     """
     Write weight metric info to file
 
+    :param project: project directory name
     :param file_len: length of byte sequence in one seed
     :param file_list: file name list
     :parameter w_matrix: [np.array] weight matrix of seed byte
@@ -131,12 +133,12 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None):
     if w_matrix is None or file_list is None:
         return -1
 
-    with open('./programs/zlib/weight_info', 'w') as f:
+    with open('./programs/' + project + '/weight_info', 'w') as f:
         for i in range(len(file_list)):
             # print(file_list[i] + ": " + str(w_matrix[i][0]))
             j = file_len[i]
             weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
-            f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programzlibs/zlib/out/queue/' + file_list[i] + '\n')
+            f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programzlibs/' + project + '/out/queue/' + file_list[i] + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     # print(a)
     # print(b)

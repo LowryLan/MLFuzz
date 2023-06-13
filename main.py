@@ -12,15 +12,28 @@ HOST = '127.0.0.1'
 PORT = 12012
 
 
+def get_args():
+    """
+    get arguments from terminal
+    example: ./main.py libxml[argv1] xmllint[argv2]
+
+    :return: project & PUT
+    """
+    project = sys.argv[1]       # directory name of project
+    PUT = sys.argv[2]           # file name of program under test
+    return project, PUT
+
+
 def main():
     print('begin py mode')
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((HOST, PORT))
     sock.listen(1)
     conn, addr = sock.accept()
-    path = './programs/zlib/out/queue/'
+    project, PUT = get_args()
+    path = './programs/' + project + '/out/queue/'
     print('connected by neuzz execution moduel ' + str(addr))
-    attention.generate_weight(path)
+    attention.generate_weight(path, project)
     conn.sendall(b"start")
     print("send success")
     while True:
