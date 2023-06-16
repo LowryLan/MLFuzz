@@ -43,7 +43,7 @@ def main():
             break
         else:
             print('connected')
-            attention.generate_weight(path)
+            attention.generate_weight(path, project)
             print('generate complete')
             conn.sendall(b"yesss")
     conn.close()

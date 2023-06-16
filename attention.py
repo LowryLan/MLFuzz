@@ -78,6 +78,37 @@ class MultiHeadAttention(nn.Module):
         return attn_output
 
 
+def split_list(byte_arr=None, file_list=None, file_len=None):
+    """
+    draw seeds with 10000+ bytes
+    :parameter byte_arr: byte sequence of seed
+    :parameter file_list: seed name list
+    :parameter file_len: length of byte sequence
+
+    :return: byte_arr_new, file_list_new, byte_arr_full, file_list_full
+    """
+
+    byte_arr_new = []           # byte list with 10000- byte
+    file_list_new = []          # seed name with 10000- byte
+    byte_arr_full = []          # byte list with 10000+ byte
+    file_list_full = []         # seed name with 10000- byte
+    file_len_new = []           # length of byte sequence with 10000- byte
+    file_len_full = []          # length of byte sequence with 10000+ byte
+
+    for i in range(len(file_len)):
+        if file_len[i] <= 10000:
+            byte_arr_new.append(byte_arr[i])
+            file_list_new.append(file_list[i])
+            file_len_new.append(file_len[i])
+        else:
+            byte_arr_full.append(byte_arr[i])
+            file_list_full.append(file_list[i])
+            file_len_full.append(file_len[i])
+    byte_arr_new = np.array(byte_arr_new)
+    byte_arr_full = np.array(byte_arr_full)
+    return byte_arr_new, file_list_new, byte_arr_full, file_list_full, file_len_new, file_len_full
+
+
 def generate_weight(path=None, project=None):
     """
     Get weight metric of byte metric
@@ -91,42 +122,62 @@ def generate_weight(path=None, project=None):
         return 0
 
     d_model = 10000
-    """ TODO: set a value to make program running if byte length more than 10000 """
-    if project == 'zlib':
-        d_model = 10000
+    flag = 0            # 1: the longest length of seed is more than 10000 ;; 0: shorter than 10000
     byte_arr, file_list, file_len = data.get_byte(path)
-    byte_arr = np.array([byte_arr])
+    file_list_len_orig = len(file_list)
+    if max(file_len) > 10000:
+        byte_arr_new, file_list_new, byte_arr_full, file_list_full, file_len_new, file_len_full = \
+            split_list(byte_arr=byte_arr, file_list=file_list, file_len=file_len)
+        flag = 1
+        byte_arr = np.array([byte_arr_new])
+    else:
+        file_list_full = []
+        byte_arr = np.array([byte_arr])
     byte_arr = byte_arr.astype(np.float32)
     byte_ten = torch.tensor(byte_arr)
 
     multihead_attn = MultiHeadAttention(d_model=d_model, n_heads=8)
 
     output = multihead_attn(byte_ten)
-    output = output[0].detach().numpy()
+    output = output[0].detach().numpy().tolist()     # get weight info
+
+    # append the full seed to all list rear
+    if flag == 1:
+        print('flag is 1')
+        file_list = file_list_new
+        file_len = file_len_new
+        # file_list = file_list_new + file_list_full
+        # file_len = file_len_new + file_len_full
+    #     for i in range(len(file_len_full)):
+    #         weight_list = [1 for i in range(10000)]
+    #         output.append(weight_list)
 
     # 按照文件id重新排序
     index_list = []
     file_len_new = []
     file_list_new = []
     output_new = []
+
     for i in range(len(file_list)):
         index = int(file_list[i].split(',')[0].split(':')[1])
         index_list.append(index)
-    for i in range(len(file_list)):
-        file_list_new.append(file_list[index_list.index(i)])
-        file_len_new.append(file_len[index_list.index(i)])
-        output_new.append(output[index_list.index(i)])
+    for i in range(file_list_len_orig):
+        if i in index_list:
+            file_list_new.append(file_list[index_list.index(i)])
+            file_len_new.append(file_len[index_list.index(i)])
+            output_new.append(output[index_list.index(i)])
 
-    if write_to_file(output_new, file_list_new, file_len_new, project):
+    if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full):
         return 1
     else:
         return -1
 
 
-def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None):
+def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None):
     """
     Write weight metric info to file
 
+    :param file_list_full:
     :param project: project directory name
     :param file_len: length of byte sequence in one seed
     :param file_list: file name list
@@ -139,14 +190,14 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None):
 
     with open('./programs/' + project + '/weight_info', 'w') as f:
         for i in range(len(file_list)):
-            # print(file_list[i] + ": " + str(w_matrix[i][0]))
             j = file_len[i]
-            weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+            if file_list[i] in file_list_full:
+                weight_info = ['-1' for l in range(j)]
+            else:
+                weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
             f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' + file_list[i] + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
-    # print(a)
-    # print(b)
     return 1
 
 
-# print(generate_weight('./programs/libxml/in/'))
+# print(generate_weight('./programs/zlib/out/queue/', project='zlib'))
