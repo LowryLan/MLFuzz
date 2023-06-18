@@ -19,9 +19,7 @@ def get_edge_cov(file_path=None):
     line = f.readline()  # 读取第一行
     i = 1
     while line:
-        # print(line)
         edge_cov = line.split(',')
-        # print(f"第{i}个测试用例: 共覆盖{str(len(edge_cov))}个边")
         i += 1
         """ 将覆盖边的位置存入 edge_list """
         edge_list.append(int(t) for t in edge_cov[:-2])  # 列表增加
@@ -36,7 +34,6 @@ def get_edge_cov(file_path=None):
     edge_array = np.array(edge_list)
     array_e = np.delete(array_e, np.where(~array_e.any(axis=0))[0], axis=1)
     print(array_e)
-    # print(edge_array)
     return edge_array
 
 
@@ -52,7 +49,6 @@ def get_bits(max_feature_length=10000, path=None):
     with open(path, "r", encoding='iso-8859-1') as f:
         t = f.read()
         byarray = bytearray(t, encoding='iso-8859-1')
-        # print(x)
         ll = ll + len(byarray)
         longest_testcase_length = 0
         if len(byarray) > longest_testcase_length:
@@ -65,11 +61,8 @@ def get_bits(max_feature_length=10000, path=None):
         b10_list = []
         for i in b16_list:
             b10 = int(i, 16)
-            # print(b10)
             b10_list.append(b10)
-        # print(b10_list)
         x_data.append(b10_list)
-    # print(x_data[0])
     return x_data[0], ll
 
 
@@ -84,7 +77,6 @@ def get_byte(dir_path=None):
     files = os.listdir(dir_path)
     for file in files:  # 遍历文件夹
         if file == '.state':
-            # print(1)
             continue
         X_file_name.append(file)  # 存储所有种子文件名
         file = dir_path + '' + file
@@ -92,8 +84,6 @@ def get_byte(dir_path=None):
         X.append(x_data)
         file_len.append(x_len)
     X = np.array(X)
-    # print(len(X))
-    # print(X)
     return X, X_file_name, file_len
 
 
@@ -108,6 +98,5 @@ def test():
     b10_list = []
     for i in b16_list:
         b10 = int(i, 16)
-        # print(b10)
         b10_list.append(b10)
     print(b10_list)

@@ -91,7 +91,7 @@ def split_list(byte_arr=None, file_list=None, file_len=None):
     byte_arr_new = []       # byte list with 10000- byte
     file_list_new = []      # seed name with 10000- byte
     byte_arr_full = []      # byte list with 10000+ byte
-    file_list_full = []     # seed name with 10000- byte
+    file_list_full = []     # seed name with 10000+ byte
     file_len_new = []       # length of byte sequence with 10000- byte
     file_len_full = []      # length of byte sequence with 10000+ byte
 
@@ -117,12 +117,11 @@ def generate_weight(path=None, project=None):
     :parameter path: seed path
     :return: weight list of byte sequence
     """
-    # path = './programs/libxml/in/'
     if path is None or project is None:
         return 0
 
     d_model = 10000
-    flag = 0  # 1: the longest length of seed is more than 10000 ;; 0: shorter than 10000
+    flag = 0  # 1: the longest length of seed is more than 10000 || 0: shorter than 10000
     byte_arr, file_list, file_len = data.get_byte(path)
     file_list_len_orig = len(file_list)
     if max(file_len) > 10000:
@@ -141,16 +140,11 @@ def generate_weight(path=None, project=None):
     output = multihead_attn(byte_ten)
     output = output[0].detach().numpy().tolist()  # get weight info
 
-    # append the full seed to all list rear
+    # only use seeds with 10000- bytes
     if flag == 1:
         print('flag is 1')
         file_list = file_list_new
         file_len = file_len_new
-        # file_list = file_list_new + file_list_full
-        # file_len = file_len_new + file_len_full
-    #     for i in range(len(file_len_full)):
-    #         weight_list = [1 for i in range(10000)]
-    #         output.append(weight_list)
 
     # 按照文件id重新排序
     index_list = []
@@ -188,8 +182,8 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
-    # with open('./programs/' + project + '/weight_info', 'w') as f:
-    with open('./afl-lowry/weight_info', 'w') as f:
+    # with open('./afl-lowry/weight_info', 'w') as f:
+    with open('./programs/' + project + '/weight_info', 'w') as f:
         for i in range(len(file_list)):
             j = file_len[i]
             if file_list[i] in file_list_full:
