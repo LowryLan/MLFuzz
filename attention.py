@@ -88,12 +88,12 @@ def split_list(byte_arr=None, file_list=None, file_len=None):
     :return: byte_arr_new, file_list_new, byte_arr_full, file_list_full
     """
 
-    byte_arr_new = []           # byte list with 10000- byte
-    file_list_new = []          # seed name with 10000- byte
-    byte_arr_full = []          # byte list with 10000+ byte
-    file_list_full = []         # seed name with 10000- byte
-    file_len_new = []           # length of byte sequence with 10000- byte
-    file_len_full = []          # length of byte sequence with 10000+ byte
+    byte_arr_new = []       # byte list with 10000- byte
+    file_list_new = []      # seed name with 10000- byte
+    byte_arr_full = []      # byte list with 10000+ byte
+    file_list_full = []     # seed name with 10000- byte
+    file_len_new = []       # length of byte sequence with 10000- byte
+    file_len_full = []      # length of byte sequence with 10000+ byte
 
     for i in range(len(file_len)):
         if file_len[i] <= 10000:
@@ -122,7 +122,7 @@ def generate_weight(path=None, project=None):
         return 0
 
     d_model = 10000
-    flag = 0            # 1: the longest length of seed is more than 10000 ;; 0: shorter than 10000
+    flag = 0  # 1: the longest length of seed is more than 10000 ;; 0: shorter than 10000
     byte_arr, file_list, file_len = data.get_byte(path)
     file_list_len_orig = len(file_list)
     if max(file_len) > 10000:
@@ -139,7 +139,7 @@ def generate_weight(path=None, project=None):
     multihead_attn = MultiHeadAttention(d_model=d_model, n_heads=8)
 
     output = multihead_attn(byte_ten)
-    output = output[0].detach().numpy().tolist()     # get weight info
+    output = output[0].detach().numpy().tolist()  # get weight info
 
     # append the full seed to all list rear
     if flag == 1:
@@ -188,16 +188,17 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
-    with open('./programs/' + project + '/weight_info', 'w') as f:
+    # with open('./programs/' + project + '/weight_info', 'w') as f:
+    with open('./afl-lowry/weight_info', 'w') as f:
         for i in range(len(file_list)):
             j = file_len[i]
             if file_list[i] in file_list_full:
                 weight_info = ['-1' for l in range(j)]
             else:
                 weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
-            f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' + file_list[i] + '\n')
+            f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' +
+                    file_list[i] + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     return 1
-
 
 # print(generate_weight('./programs/zlib/out/queue/', project='zlib'))

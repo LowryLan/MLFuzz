@@ -31,7 +31,7 @@ def record_edge(testcase_dir, binary_file_path, base_cmd, save_path):
         #     save_file.write(f"{e}\n")
 
 
-# record_edge('/home/lowry/Documents/myFuzz/MLFuzz/programs/mupdf/out/',
-#             '/home/lowry/Documents/afl-program/mupdf/mutool',
-#             'show',
-#             './edge_cov_mupdf')
+# record_edge('/home/lowry/Documents/myFuzz/MLFuzz/programs/zlib/out/',
+#             '/home/lowry/Documents/afl-program/zlib/miniunz',
+#             '-o',
+#             './edge_cov_zlib')
