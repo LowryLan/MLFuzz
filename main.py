@@ -33,7 +33,7 @@ def main():
     project, PUT = get_args()
     print(f"{project} is the program under test")
     path = './programs/' + project + '/out/queue/'
-    print('connected by neuzz execution moduel ' + str(addr))
+    print('connected by MLFuzz execution module ' + str(addr))
     attention.generate_weight(path, project)
     conn.sendall(b"start")
     print("send success")
