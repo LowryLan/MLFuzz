@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import data
 import numpy as np
+import goodSeed
 
 
 class SelfAttention(nn.Module):
@@ -109,10 +110,12 @@ def split_list(byte_arr=None, file_list=None, file_len=None):
     return byte_arr_new, file_list_new, byte_arr_full, file_list_full, file_len_new, file_len_full
 
 
-def generate_weight(path=None, project=None):
+def generate_weight(path=None, project=None, flag0=None, cur_path=None):
     """
     Get weight metric of byte metric
 
+    :param flag0: if the first fuzzing
+    :param cur_path: fuzzing now
     :param project: project directory name
     :parameter path: seed path
     :return: weight list of byte sequence
@@ -161,16 +164,21 @@ def generate_weight(path=None, project=None):
             file_len_new.append(file_len[index_list.index(i)])
             output_new.append(output[index_list.index(i)])
 
-    if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full):
+    dir_path = './programs/' + project + '/out/queue'
+    good_seed = goodSeed.main_prt(flag0=flag0, dir_path=dir_path, cur_path=cur_path)
+    # print(good_seed)
+
+    if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, good_seed):
         return 1
     else:
         return -1
 
 
-def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None):
+def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None, good_seed=None):
     """
     Write weight metric info to file
 
+    :param good_seed: only chose these seed
     :param file_list_full:
     :param project: project directory name
     :param file_len: length of byte sequence in one seed
@@ -182,12 +190,15 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
-    # with open('./afl-lowry/weight_info', 'w') as f:
-    with open('./programs/' + project + '/weight_info', 'w') as f:
+    with open('./afl-lowry/weight_info', 'w') as f:
+    # with open('./programs/' + project + '/weight_info', 'w') as f:
         for i in range(len(file_list)):
             j = file_len[i]
+            file_name = './programs/' + project + '/out/queue/' + file_list[i]
+            if file_name not in good_seed:
+                continue
             if file_list[i] in file_list_full:
-                weight_info = ['-1' for l in range(j)]
+                continue
             else:
                 weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
             f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' +

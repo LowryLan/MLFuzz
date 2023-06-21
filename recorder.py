@@ -26,7 +26,7 @@ def record_edge(testcase_dir, binary_file_path, base_cmd, save_path):
         #     save_file.write(f"{e}\n")
 
 
-# record_edge('/home/lowry/Documents/myFuzz/MLFuzz/programs/zlib/out/',
-#             '/home/lowry/Documents/afl-program/zlib/miniunz',
-#             '-o',
-#             './edge_cov_zlib')
+record_edge('/home/lowry/Documents/myFuzz/MLFuzz/programs/readelf/out/',
+            '/home/lowry/Documents/afl-program/readelf/readelf',
+            '-a',
+            './edge_cov_readelf')
