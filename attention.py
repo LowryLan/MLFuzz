@@ -89,12 +89,12 @@ def split_list(byte_arr=None, file_list=None, file_len=None):
     :return: byte_arr_new, file_list_new, byte_arr_full, file_list_full
     """
 
-    byte_arr_new = []       # byte list with 10000- byte
-    file_list_new = []      # seed name with 10000- byte
-    byte_arr_full = []      # byte list with 10000+ byte
-    file_list_full = []     # seed name with 10000+ byte
-    file_len_new = []       # length of byte sequence with 10000- byte
-    file_len_full = []      # length of byte sequence with 10000+ byte
+    byte_arr_new = []  # byte list with 10000- byte
+    file_list_new = []  # seed name with 10000- byte
+    byte_arr_full = []  # byte list with 10000+ byte
+    file_list_full = []  # seed name with 10000+ byte
+    file_len_new = []  # length of byte sequence with 10000- byte
+    file_len_full = []  # length of byte sequence with 10000+ byte
 
     for i in range(len(file_len)):
         if file_len[i] <= 10000:
@@ -163,6 +163,7 @@ def generate_weight(path=None, project=None, flag0=None, cur_path=None):
             file_list_new.append(file_list[index_list.index(i)])
             file_len_new.append(file_len[index_list.index(i)])
             output_new.append(output[index_list.index(i)])
+    # 排序 end
 
     dir_path = './programs/' + project + '/out/queue'
     good_seed = goodSeed.main_prt(flag0=flag0, dir_path=dir_path, cur_path=cur_path)
@@ -190,8 +191,8 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
-    with open('./afl-lowry/weight_info', 'w') as f:
-    # with open('./programs/' + project + '/weight_info', 'w') as f:
+    # with open('./afl-lowry/weight_info', 'w') as f:
+    with open('./programs/' + project + '/weight_info', 'w') as f:
         for i in range(len(file_list)):
             j = file_len[i]
             file_name = './programs/' + project + '/out/queue/' + file_list[i]
@@ -206,4 +207,38 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     return 1
 
-# print(generate_weight('./programs/zlib/out/queue/', project='zlib'))
+
+def write_to_file_neuzz(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None, sign=None):
+    """
+    Write weight metric info to file for neuzz.c
+
+    :param good_seed: only chose these seed
+    :param file_list_full:
+    :param project: project directory name
+    :param file_len: length of byte sequence in one seed
+    :param file_list: file name list
+    :parameter w_matrix: [np.array] weight matrix of seed byte
+    :return: 1 or -1
+    """
+
+    if w_matrix is None or file_list is None:
+        return -1
+
+    with open('./programsForNeuzz/' + project + '/gradient_info_p', 'w') as f:
+        for i in range(len(file_list)):
+            j = file_len[i]
+            if file_list[i] in file_list_full or (file_list[i][2] == ':' and sign == 1):
+                continue
+            else:
+                if sign == 0:
+                    weight_forward = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+                else:
+                    weight_forward = ['-1' if w_matrix[i][l] > 0 else '1' for l in range(j)]
+                weight_info = [str(int(w_matrix[i][l])) if w_matrix[i][l] > 0 else str(-1 * int(w_matrix[i][l])) for l in
+                               range(j)]
+            f.write(','.join(weight_info) + '|' + ','.join(weight_forward) + '|' + './seeds/' + file_list[i] + '\n')
+            # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
+    return 1
+
+
+# print(generate_weight('./programsForNeuzz/readelf/neuzz_in/', project='readelf'))

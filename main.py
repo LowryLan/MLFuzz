@@ -44,10 +44,10 @@ def main():
         if not data:
             break
         else:
-            print('connected')
+            print(f'connected, sign is {data}')
             attention.generate_weight(path=path, project=project, flag0=1, cur_path=None)
             print('generate complete')
-            conn.sendall(b"yesss")
+            conn.sendall(b"yesss")            # send to MLFuzz
     conn.close()
 
 
