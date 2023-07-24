@@ -79,7 +79,7 @@ def similarity(byte_array=None, seed_list=None, max_len=None):
     a_list = sim_a(byte_array=byte_array, seed_list=seed_list, max_len=max_len)
     b_list = sim_b(byte_array=byte_array, seed_list=seed_list, max_len=max_len)
 
-    k = 0.5                                                 # 超参数k(α)
+    k = 0.7                                                 # 超参数k(α)
 
     similarity_list = [round(a_list[i] * k + b_list[i] * (1 - k), 6) for i in range(len(seed_list))]
     return similarity_list

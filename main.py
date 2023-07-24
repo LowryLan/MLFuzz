@@ -21,8 +21,7 @@ def get_args():
     """
     project = sys.argv[1]       # directory name of project
     PUT = sys.argv[2]           # file name of program under test
-    cur_path = sys.argv[3]      # fuzzing position
-    return project, PUT, int(cur_path)
+    return project, PUT
 
 
 def main():
@@ -31,12 +30,11 @@ def main():
     sock.bind((HOST, PORT))
     sock.listen(1)
     conn, addr = sock.accept()
-    project, PUT, cur_path = get_args()
+    project, PUT = get_args()
     print(f"{project} is the program under test")
-    print(f"cur_path is: {cur_path}")
     path = './programs/' + project + '/out/queue/'
     print('connected by MLFuzz execution module ' + str(addr))
-    attention.generate_weight(path=path, project=project, flag0=0, cur_path=cur_path)
+    attention.generate_weight(path=path, project=project)
     conn.sendall(b"start")
     print("send success")
     while True:
@@ -45,7 +43,7 @@ def main():
             break
         else:
             print(f'connected, sign is {data}')
-            attention.generate_weight(path=path, project=project, flag0=1, cur_path=None)
+            attention.generate_weight(path=path, project=project)
             print('generate complete')
             conn.sendall(b"yesss")            # send to MLFuzz
     conn.close()

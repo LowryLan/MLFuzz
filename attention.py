@@ -9,6 +9,7 @@ import torch.nn as nn
 import data
 import numpy as np
 import goodSeed
+import similarity
 
 
 class SelfAttention(nn.Module):
@@ -110,12 +111,10 @@ def split_list(byte_arr=None, file_list=None, file_len=None):
     return byte_arr_new, file_list_new, byte_arr_full, file_list_full, file_len_new, file_len_full
 
 
-def generate_weight(path=None, project=None, flag0=None, cur_path=None):
+def generate_weight(path=None, project=None):
     """
     Get weight metric of byte metric
 
-    :param flag0: if the first fuzzing
-    :param cur_path: fuzzing now
     :param project: project directory name
     :parameter path: seed path
     :return: weight list of byte sequence
@@ -126,11 +125,14 @@ def generate_weight(path=None, project=None, flag0=None, cur_path=None):
     d_model = 10000
     flag = 0  # 1: the longest length of seed is more than 10000 || 0: shorter than 10000
     byte_arr, file_list, file_len = data.get_byte(path)
-    file_list_len_orig = len(file_list)
+
+    byte_arr0 = byte_arr
+
     if max(file_len) > 10000:
         byte_arr_new, file_list_new, byte_arr_full, file_list_full, file_len_new, file_len_full = \
             split_list(byte_arr=byte_arr, file_list=file_list, file_len=file_len)
         flag = 1
+        byte_arr0 = byte_arr_new
         byte_arr = np.array([byte_arr_new])
     else:
         file_list_full = []
@@ -149,36 +151,48 @@ def generate_weight(path=None, project=None, flag0=None, cur_path=None):
         file_list = file_list_new
         file_len = file_len_new
 
+    similarity_list = similarity.similarity_re(byte_array=byte_arr0, seed_list=file_list, max_len=max(file_len))
+
     # 按照文件id重新排序
     index_list = []
-    file_len_new = []
-    file_list_new = []
-    output_new = []
+    file_len_new = file_len
+    file_list_new = file_list
+    output_new = output
 
-    for i in range(len(file_list)):
-        index = int(file_list[i].split(',')[0].split(':')[1])
-        index_list.append(index)
-    for i in range(file_list_len_orig):
-        if i in index_list:
-            file_list_new.append(file_list[index_list.index(i)])
-            file_len_new.append(file_len[index_list.index(i)])
-            output_new.append(output[index_list.index(i)])
+    # for i in range(len(file_list)):
+    #     index = int(file_list[i].split(',')[0].split(':')[1])
+    #     index_list.append(index)
+    # for i in range(file_list_len_orig):
+    #     if i in index_list:
+    #         file_list_new.append(file_list[index_list.index(i)])
+    #         file_len_new.append(file_len[index_list.index(i)])
+    #         output_new.append(output[index_list.index(i)])
     # 排序 end
 
     dir_path = './programs/' + project + '/out/queue'
-    good_seed = goodSeed.main_prt(flag0=flag0, dir_path=dir_path, cur_path=cur_path)
+    # good_seed = goodSeed.main_prt(flag0=flag0, dir_path=dir_path, cur_path=cur_path)
     # print(good_seed)
 
-    if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, good_seed):
+    # if len(file_len_new) <= 1000:
+    #     seed_num = 700
+    # elif len(file_len_new) <= 2000:
+    #     seed_num = 1000
+    # elif len(file_len_new) > 2000:
+    #     seed_num = 1500
+    seed_num = int(len(file_len_new) * 0.1)
+
+    # if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, good_seed):
+    if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, similarity_list, seed_num):
         return 1
     else:
         return -1
 
 
-def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None, good_seed=None):
+def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, file_list_full=None, similarity_list=None, seed_num=None):
     """
     Write weight metric info to file
 
+    :param seed_num: select seed number
     :param good_seed: only chose these seed
     :param file_list_full:
     :param project: project directory name
@@ -191,17 +205,14 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
-    # with open('./afl-lowry/weight_info', 'w') as f:
-    with open('./programs/' + project + '/weight_info', 'w') as f:
-        for i in range(len(file_list)):
+    with open('./afl-lowry/weight_info', 'w') as f:
+    # with open('./programs/' + project + '/weight_info', 'w') as f:
+        for t in range(seed_num):
+            temp = similarity_list[t]
+            i = file_list.index(temp)
             j = file_len[i]
-            file_name = './programs/' + project + '/out/queue/' + file_list[i]
-            if file_name not in good_seed:
-                continue
-            if file_list[i] in file_list_full:
-                continue
-            else:
-                weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+            # file_name = './programs/' + project + '/out/queue/' + file_list[i]
+            weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
             f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' +
                     file_list[i] + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
@@ -241,4 +252,4 @@ def write_to_file_neuzz(w_matrix=None, file_list=None, file_len=None, project=No
     return 1
 
 
-# print(generate_weight('./programsForNeuzz/readelf/neuzz_in/', project='readelf'))
+# print(generate_weight('./programs/readelf/out_sim0.7_0.5n/queue/', project='readelf'))
