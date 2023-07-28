@@ -179,7 +179,7 @@ def generate_weight(path=None, project=None):
     #     seed_num = 1000
     # elif len(file_len_new) > 2000:
     #     seed_num = 1500
-    seed_num = int(len(file_len_new) * 0.1)
+    seed_num = int(len(file_len_new) * 0.5)
 
     # if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, good_seed):
     if write_to_file(output_new, file_list_new, file_len_new, project, file_list_full, similarity_list, seed_num):
@@ -205,6 +205,8 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
     if w_matrix is None or file_list is None:
         return -1
 
+    sign = str(int(seed_num * 0.7))
+
     with open('./afl-lowry/weight_info', 'w') as f:
     # with open('./programs/' + project + '/weight_info', 'w') as f:
         for t in range(seed_num):
@@ -214,7 +216,7 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
             # file_name = './programs/' + project + '/out/queue/' + file_list[i]
             weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
             f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' +
-                    file_list[i] + '\n')
+                    file_list[i] + '|' + sign + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
     return 1
 
@@ -252,4 +254,4 @@ def write_to_file_neuzz(w_matrix=None, file_list=None, file_len=None, project=No
     return 1
 
 
-# print(generate_weight('./programs/readelf/out_sim0.7_0.5n/queue/', project='readelf'))
+# print(generate_weight('./programs/readelf/in/', project='readelf'))

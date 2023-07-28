@@ -54,7 +54,7 @@ def sim_b(byte_array=None, seed_list=None, max_len=None):
         for q in range(i):                          # 填充下三角元素，减少逐个遍历的时间
             similarity_b.append(similarity_b_matrix[q][i])
         similarity_b.append(1)
-        for j in tqdm(range(seed_num-i-1), desc=f'Similarity_b({i+1}/{seed_num})--->seed {seed_list[i]}'):
+        for j in tqdm(range(seed_num-i-1), desc=f'Similarity_b({i+1}/{seed_num})--->seed {seed_list[i][:9]}'):
             j += (i + 1)
             similarity_num = 0                      # 相同位置字节大小相同的数量
             for t in range(max_len):
@@ -76,7 +76,7 @@ def similarity(byte_array=None, seed_list=None, max_len=None):
 
     :return similarity_list: 相似度度量结果
     """
-    a_list = sim_a(byte_array=byte_array, seed_list=seed_list, max_len=max_len)
+    # a_list = sim_a(byte_array=byte_array, seed_list=seed_list, max_len=max_len)
     b_list = sim_b(byte_array=byte_array, seed_list=seed_list, max_len=max_len)
 
     k = 0.7                                                 # 超参数k(α)
