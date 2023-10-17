@@ -214,7 +214,8 @@ def write_to_file(w_matrix=None, file_list=None, file_len=None, project=None, fi
             i = file_list.index(temp)
             j = file_len[i]
             # file_name = './programs/' + project + '/out/queue/' + file_list[i]
-            weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+            # weight_info = ['1' if w_matrix[i][l] > 0 else '-1' for l in range(j)]
+            weight_info = ['1' for l in range(j)]
             f.write(','.join(weight_info) + '|/home/lowry/Documents/myFuzz/MLFuzz/programs/' + project + '/out/queue/' +
                     file_list[i] + '|' + sign + '\n')
             # f.write(','.join(weight_info) + '|' + str(file_len[i]) + '|' + file_list[i] + '\n')
